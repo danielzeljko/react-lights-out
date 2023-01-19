@@ -37,7 +37,7 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
     for (let row = 0; row < nrows; row++) {
       const tempRow = [];
       for (let col = 0; col < ncols; col++) {
-        const cell = Math.random() < chanceLightStartsOn ? "t" : "f";
+        const cell = Math.random() < chanceLightStartsOn;
         tempRow.push(cell);
       }
       initialBoard.push(tempRow);
@@ -52,7 +52,7 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
   function flipCellsAround(coord) {
     setBoard(oldBoard => {
       const [y, x] = coord.split("-").map(Number);
-
+      console.log("y,x", y, x);
       const flipCell = (y, x, boardCopy) => {
         // if this coord is actually on board, flip it
 
@@ -63,9 +63,23 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
 
       // TODO: Make a (deep) copy of the oldBoard
 
-      // TODO: in the copy, flip this cell and the cells around it
+      const tempBoard = oldBoard.map(row => [...row]);
 
+      // TODO: in the copy, flip this cell and the cells around it
+      flipCell(y, x, tempBoard); //samecell
+      flipCell(y + 1, x, tempBoard); //below
+      flipCell(y - 1, x, tempBoard); //above
+      flipCell(y, x + 1, tempBoard); //right
+      flipCell(y, x - 1, tempBoard); //left
+
+      // tempBoard[y][x] === 't' ? tempBoard[y][x] = 'f' : tempBoard[y][x] = 't';
+      // tempBoard[y + 1][x] === 't' ? tempBoard[y + 1][x] = 'f' : tempBoard[y + 1][x] = 't'; //below
+      // tempBoard[y - 1][x] === 't' ? tempBoard[y - 1][x] = 'f' : tempBoard[y - 1][x] = 't'; //above
+      // tempBoard[y][x - 1] === 't' ? tempBoard[y][x - 1] = 'f' : tempBoard[y][x - 1] = 't'; //left
+      // tempBoard[y][x + 1] === 't' ? tempBoard[y][x + 1] = 'f' : tempBoard[y][x + 1] = 't'; //right
       // TODO: return the copy
+
+      return tempBoard;
     });
   }
 
@@ -77,18 +91,18 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
 
   const table = [];
 
-  for(let i = 0; i < nrows; i++){
+  for (let i = 0; i < nrows; i++) {
     const nextTR = [];
-    for(let j = 0; j < ncols; j++){
-      nextTR.push(<Cell isLit={board[i][j] === "t"} />)
+    for (let j = 0; j < ncols; j++) {
+      nextTR.push(<Cell isLit={board[j][i]} key={`${j}-${i}`} flipCellsAroundMe={() => flipCellsAround(`${j}-${i}`)} />);
     }
-    table.push(<tr>{nextTR}</tr>)
+    table.push(<tr key={i}>{nextTR}</tr>);
   }
 
   return (
     <table>
       <tbody>
-      {table}
+        {table}
       </tbody>
     </table>
   );
